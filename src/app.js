@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 import __dirname from './utils.js';
 import passport from 'passport';
 import initializePassport from './config/passport.config.js';
+import dotenv from 'dotenv';
+
 
 const app = express();
 const PORT = 4000;
@@ -14,6 +16,7 @@ const PORT = 4000;
 // Importar los routers
 import userRouter from './routes/user.router.js';
 import sessionRouter from './routes/session.router.js';
+import indexRouter from './routes/index.router.js';
 
 // URL de conexión a MongoDB
 const mongoURL = 'mongodb://localhost:27017/backend2';
@@ -34,12 +37,14 @@ mongoose.connect(mongoURL, {
 app.use(cookieParser());
 
 // Configurar sesiones con MongoDB
+dotenv.config();
+
 app.use(session({
   store: MongoStore.create({
     mongoUrl: mongoURL,
     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
   }),
-  secret: 'asd3nc3okasod', // Cambiar por una clave secreta más segura
+  secret: process.env.SESSION_SECRET, // Cambiar por una clave secreta más segura
   resave: false,
   saveUninitialized: false,
 }));
@@ -60,6 +65,7 @@ app.use(express.static(__dirname + '/public'));
 // Registrar rutas
 app.use('/', userRouter);
 app.use('/api', sessionRouter);
+app.use('/', indexRouter);
 
 // Iniciar servidor
 app.listen(PORT, () => {

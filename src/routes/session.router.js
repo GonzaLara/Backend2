@@ -1,77 +1,54 @@
 import express from 'express';
 import passport from 'passport';
 import User from '../models/user.models.js';
-import { isValidPassword, createHash } from '../utils.js';
+import { generateToken } from '../config/jwt.config.js';
 
 const router = express.Router();
 
-//Registro
+// Registro
 router.post('/register', passport.authenticate('register', { failureRedirect: '/failregister' }), async (req, res) => {
-    try {
-        console.log('Usuario registrado.');
-        res.redirect('/login');
-    } catch (error) {
-        console.error('Error al registrar usuario:', error);
-        res.status(500).send('Error al registrar usuario');
-    }
+    res.redirect('/login');
 });
 
 router.get('/failregister', (req, res) => {
-    res.send({ error: 'Failed' });
+    res.status(400).send({ error: 'Registro fallido' });
 });
 
-//Iniciar sesión 
-router.post('/login', passport.authenticate('login', { failureRedirect: '/failloging' }), async (req, res) => {
+// Iniciar sesión
+router.post('/login', passport.authenticate('login', { failureRedirect: '/faillogin' }), async (req, res) => {
     try {
-        if (!req.user)
-            return res.status(400).send({ status: 'error', error: 'Invalid credentials' });
+        const user = req.user;
+        if (!user) {
+            return res.status(400).send({ status: 'error', error: 'Credenciales inválidas' });
+        }
 
-        req.session.user = {
-            first_name: req.user.first_name,
-            last_name: req.user.last_name,
-            age: req.user.age,
-            email: req.user.email
-        };
-        res.redirect('/perfil');
+        // Generar un token JWT
+        const token = generateToken(user);
+
+        // Enviar el token al cliente en una cookie
+        res.cookie('token', token, { httpOnly: true }).redirect('/'); // Redirige a la página index
     } catch (error) {
-        console.error('Error al iniciar sesión');
+        console.error('Error al iniciar sesión:', error);
         res.status(500).send('Error al iniciar sesión');
     }
 });
 
-router.get('/failloging', (req, res) => {
-    res.send({ error: 'Failed Login' });
+
+router.get('/faillogin', (req, res) => {
+    res.status(400).send({ error: 'Error al iniciar sesión' });
 });
 
-//Restaurar contraseña
-router.post('/restore-password', async (req, res) => {
-    const { email, newPassword } = req.body;
-    try {
-        const user = await User.findOne({ email: email });
-        if (!user) {
-            return res.status(400).send({ status: 'error', message: 'User not found' });
-        }
-
-        user.password = createHash(newPassword);
-        await user.save();
-
-        return res.redirect('/login');
-
-    } catch (error) {
-        return res.status(500).send({ status: 'error', message: 'Internal server error' });
-    }
-});
-
-//Cerrar sesión del usuario
+// Cerrar sesión
 router.post('/logout', (req, res) => {
-    req.session.destroy((error) => {
-        if (error) {
+    req.session.destroy( (error) => {
+        if(error){
             console.error('Error al cerrar sesión');
             res.status(500).send('Error al cerrar sesión');
-        } else {
+        } else{
             res.redirect('/login');
         }
-    });
-});
+    })
+})
+
 
 export default router;

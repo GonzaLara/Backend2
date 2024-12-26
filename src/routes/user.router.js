@@ -1,7 +1,7 @@
-import express  from 'express';
+import { Router}  from 'express';
 import  { isLoggedIn, isLoggedOut} from '../middlewares/auth.js';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/login', isLoggedOut, (req, res) => {
     res.render('login');
@@ -23,7 +23,7 @@ router.get('/perfil', isLoggedIn, (req, res) => {
             email: req.session.user.email,
             age: req.session.user.age
         }
-    })
+    });
 })
 
 export default router;

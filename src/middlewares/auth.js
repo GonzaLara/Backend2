@@ -1,5 +1,3 @@
-import express from 'express';
-
 export const isLoggedIn = (req, res, next) => {
     if(req.session.user){
         next(); //Permitir el acceso si hay sesión
