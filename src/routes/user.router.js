@@ -15,15 +15,4 @@ router.get('/restore-password', isLoggedOut, (req, res) => {
     res.render('restore');
 })
 
-router.get('/perfil', isLoggedIn, (req, res) => {
-    res.render('perfil',{
-        user: {
-            first_name: req.session.user.first_name,
-            last_name: req.session.user.last_name,
-            email: req.session.user.email,
-            age: req.session.user.age
-        }
-    });
-})
-
 export default router;

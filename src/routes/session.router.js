@@ -14,7 +14,7 @@ router.get('/failregister', (req, res) => {
     res.status(400).send({ error: 'Registro fallido' });
 });
 
-// Iniciar sesión
+// Iniciar sesion
 router.post('/login', passport.authenticate('login', { failureRedirect: '/faillogin' }), async (req, res) => {
     try {
         const user = req.user;
@@ -26,7 +26,7 @@ router.post('/login', passport.authenticate('login', { failureRedirect: '/faillo
         const token = generateToken(user);
 
         // Enviar el token al cliente en una cookie
-        res.cookie('token', token, { httpOnly: true }).redirect('/'); // Redirige a la página index
+        res.cookie('token', token, { httpOnly: true }).redirect('/'); // Redirige al index
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
         res.status(500).send('Error al iniciar sesión');
@@ -35,15 +35,15 @@ router.post('/login', passport.authenticate('login', { failureRedirect: '/faillo
 
 
 router.get('/faillogin', (req, res) => {
-    res.status(400).send({ error: 'Error al iniciar sesión' });
+    res.status(400).send({ error: 'Error al iniciar sesion' });
 });
 
-// Cerrar sesión
+// Cerrar sesion
 router.post('/logout', (req, res) => {
     req.session.destroy( (error) => {
         if(error){
-            console.error('Error al cerrar sesión');
-            res.status(500).send('Error al cerrar sesión');
+            console.error('Error al cerrar sesion');
+            res.status(500).send('Error al cerrar sesion');
         } else{
             res.redirect('/login');
         }
