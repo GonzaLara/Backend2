@@ -18,26 +18,26 @@ import userRouter from './routes/user.router.js';
 import sessionRouter from './routes/session.router.js';
 import indexRouter from './routes/index.router.js';
 
-// URL de conexión a MongoDB
-const mongoURL = 'mongodb://localhost:27017/backend2';
-
-// Middleware para analizar JSON y datos de formularios
+// Configurar para trabajar con JSON 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Conexión a MongoDB
+// Configurar sesiones con MongoDB
+dotenv.config();
+const mongoURL = process.env.DB_URI;
+
+// Conexion a MongoDB
 mongoose.connect(mongoURL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-  .then(() => console.log('Conectado a la base de datos MongoDB'))
-  .catch((error) => console.error('Error en la conexión:', error));
+  .then(() => console.log('Conectado a la base de datos MongoDB Atlas'))
+  .catch((error) => console.error('Error en la conexion:', error));
+
 
 // Configurar cookies
 app.use(cookieParser());
 
-// Configurar sesiones con MongoDB
-dotenv.config();
 
 app.use(session({
   store: MongoStore.create({
@@ -71,16 +71,6 @@ app.use('/', indexRouter);
 app.listen(PORT, () => {
   console.log(`Servidor iniciado en http://localhost:${PORT}`);
 });
-//
-
-
-// // Configurar para trabajar con JSON 
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
-
-// // Cargar las variables de entorno
-// dotenv.config();
-// const URIConexion = process.env.DB_URI;
 
 // // Conexion a la base de datos
 // mongoose.connect(URIConexion)
@@ -98,12 +88,6 @@ app.listen(PORT, () => {
 //         allowProtoMethodsByDefault: true,
 //     },
 // }));
-
-// app.set('view engine', 'handlebars');
-// app.set('views', path.join(__dirname, 'src', 'views'));
-
-// // Setear de manera estatica la carpeta public
-// app.use(express.static(path.join(__dirname, 'src', 'public')));
 
 // // Configuracion de sesiones
 // app.use(session({
